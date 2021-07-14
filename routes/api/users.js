@@ -28,7 +28,7 @@ router.post('/',
     if(!errors.isEmpty() ) {
       console.log('inside is empty'  ) ;
     
-      return res.send(400).json({errors:errors.array()}) ;
+      return res.status(400).json({errors:errors.array()}) ;
 
     }
     console.log('fuckn123241 '  ) ;
