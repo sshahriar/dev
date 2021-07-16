@@ -3,7 +3,8 @@ const router = express.Router() ;
 const gravatar = require('gravatar') ;
 const bcrypt =  require('bcryptjs' ) ;
 const User = require('../../models/Users') ;
-// const jwt =  require('jsonwebtoken') ; 
+const jwt =  require('jsonwebtoken') ;
+const config =  require('config');
 
 const {check, validationResult } = require('express-validator');
 
@@ -18,23 +19,26 @@ router.post('/',
   ]
   ,async (req,res ) => {
 
-    console.log(req.body)   ;
-
-    console.log('inside users '  ) ;
+ 
+    console.log('inside api/users'  ) ;
  
     const errors  =  validationResult(req);
 
-    console.log('fuckn '  ) ;
     if(!errors.isEmpty() ) {
       console.log('inside is empty'  ) ;
     
       return res.status(400).json({errors:errors.array()}) ;
 
     }
-    console.log('fuckn123241 '  ) ;
-    
+
+    console.log('no error found'  ) ;
+
     // inserting  into  db   
     const  {name, email ,password} = req.body  ;
+    console.log(req.body)   ;
+
+
+
 
 
     // res.send('user regestered') ; 
@@ -45,20 +49,22 @@ router.post('/',
 
      
       if(user) {
-        console.log('123fdsfdsfsdfdsfsdfdsfsafdsa')  ;
+        console.log('user exists')  ;
      
-        res.status(400).json( {
+        return res.status(400).json( {
           errors: [ { msg:'user already  exists'}] 
         
         
         })  ;
 
       }
-      console.log('fdsfdsfsdfdsfsdfdsfsafdsa')  ;
+
+      console.log('new  user')  ;
       
 
-      // avatar 
 
+
+      // avatar 
       const avatar = gravatar.url(email,{
         s:'200',
         r:'pg',
@@ -66,6 +72,9 @@ router.post('/',
         
       })
         
+
+
+
       // constructur  kinda
       // inserting into database 
       user = new User({
@@ -85,37 +94,43 @@ router.post('/',
       user.password =  await bcrypt.hash(password,salt) ;
 
     
+
+
+
       await   user.save() ;
- 
+      console.log('saved in db' ) ;
+
+     
 
 
 
+      
+      // json webntoken  //
 
-      //return json webntoken  
-      // const  payload = {
-      //   user:{
-      //     id : user.id
-      //   }
+      const  payload = {
+        user:{
+          id : user.id
+        }
 
-      // }; 
+      }; 
 
-      // jwt.sign(
-      //   payload,  
-      //   config.get('jwtsecret'),
-      //   {expiresIn:3600000},
-      //   (err,token)=>{
-      //     if(err  ) throw err ;
-      //     res.json({token })  ;
-      //   }
+      jwt.sign(
+        payload,  
+        config.get('jwtsecret'),
+        { expiresIn:36000000000 },
+        (err,token)=>{
+          if(err  ) throw err ;
+          res.json({token })  ;
+        }
 
 
-      // ) ;
+      ) ;
 
  
 
     } catch(err)  {
       console.error(err.message) ;
-      res.sendStatus(500 ).send("server error "  ) ;
+      res.status(500 ).send("server error "  ) ;
     }
 
 
