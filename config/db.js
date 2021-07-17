@@ -12,7 +12,8 @@ const connectDB =  async ()=>{
     console.log('inside db...') ; 
     await  mongoose.connect(db,{
       useUnifiedTopology:true,
-      useNewUrlParser:true 
+      useNewUrlParser:true ,
+      useCreateIndex:true
     }) ;  
     console.log('db connected') ;
   }catch(err){
