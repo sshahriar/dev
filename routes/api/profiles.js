@@ -23,7 +23,7 @@ router.get('/me', auth, async (req,res ) => {
       return res.status(400).json({msg:'no profile for this user'} ) ;
 
     }
-
+    res.json(profile ) ; 
 
   }catch(err)  {
     console.error(err.message) ;
@@ -156,4 +156,67 @@ router.get('/' , async(req,res ) =>{
 
 }) 
 
+
+//desc   get user  by id  
+//access public  
+router.get('/user/:user_id' , async(req,res ) =>{
+  console.log('insid profilens '  ) ; 
+
+  try{
+    const profile = await  Profile.findOne({
+      user:  req.params.user_id
+      
+    }).populate('user' , ['name' , 'avatar']);  
+
+    if(!profile)  { 
+      return res.status(400).json({msg:'no user'});
+
+
+    } 
+
+    res.json(profile)  ; 
+  } catch(err){
+    console.log(err.message) ;  
+
+    if(err.kind== 'ObjectId' ) {
+      return res.status(400).json({msg:'no user'});
+
+    }
+    
+    res.status(500).send('server  errror'  ) ;
+
+  } 
+}) 
+
+
+//route   DELETE  api/profile 
+//desc    delete  profile, user  and posts 
+//access private
+router.delete('/' ,auth , async(req,res ) =>{
+  console.log('insid profilens '  ) ; 
+
+  try{
+    // todo - remove user posts 
+
+    await  Profile.findOneAndRemove({user:req.user.id} ) ;
+    await  User.findOneAndRemove({user:req.user.id} ) ;
+    
+    res.json({msg: 'user deleted  '  })  ; 
+
+  } catch(err){
+    console.log(err.message) ;   
+    res.status(500).send('server  errror'  ) ;
+
+  } 
+}) 
+
+
+
 module.exports =  router ;
+
+
+
+
+
+
+
