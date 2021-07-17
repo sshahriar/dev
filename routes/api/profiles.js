@@ -6,7 +6,7 @@ const {check ,validationResult } = require('express-validator');
 const Profile =  require('../../models/Profiles') ; 
 const User =  require('../../models/Users') ; 
 
-// @route get api/profile/me 
+// @route get api/profile/me  
 // @access private
 router.get('/me', auth, async (req,res ) => {
   console.log('inside profile ' ) ; 
@@ -105,7 +105,8 @@ router.post('/' , [auth  ,[
       console.log(req.user.id  ) ; 
       console.log(profile  ) ; 
       
-      if(profile)  { 
+      if(profile)  {
+        console.log('fuck profile exists  ' ) ; 
         profile = await Profile.findOneAndUpdate(
    
           {user: req.user.id } ,
@@ -132,6 +133,27 @@ router.post('/' , [auth  ,[
       res.status(500).send('Server error') ;
     }
   }
-);
+); 
+
+
+
+//desc   get all profile 
+//access public  
+router.get('/' , async(req,res ) =>{
+  console.log('insid profilens '  ) ; 
+
+  try{
+    const profiles = await  Profile.find().populate('user' , ['name' , 'avatar']);  
+
+    res.json(profiles)  ; 
+  } catch(err){
+    console.log(err.message) ;  
+    res.status(500).send('server  errror'  ) ;
+
+  }
+
+
+
+}) 
 
 module.exports =  router ;
